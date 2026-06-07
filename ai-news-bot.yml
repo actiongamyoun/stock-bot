@@ -1,0 +1,27 @@
+name: AI 뉴스 텔레그램 봇
+
+on:
+  schedule:
+    # UTC 21:00 = 한국시간(KST) 06:00. 깃허브 부하에 따라 몇 분~십여 분 지연될 수 있음.
+    - cron: '0 21 * * *'
+  workflow_dispatch:   # Actions 탭에서 수동 실행(테스트) 버튼
+
+jobs:
+  send-news:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 의존성 설치
+        run: npm install rss-parser
+
+      - name: 뉴스 정리 후 텔레그램 발송
+        run: node scripts/send-news.mjs
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
